@@ -57,6 +57,56 @@ export class PrismaOrgsRepository implements OrgsRepository {
     return mappedOrgs
   }
 
+  async findBySlugAndNotSameId(slug: string, id: string): Promise<Orgs | null> {
+    const prismaOrgs = await this.prisma.organization.findFirst({
+      where: { slug, id: { not: id } },
+    })
+
+    if (!prismaOrgs) return null
+
+    const orgs = prismaOrgs
+
+    const mappedOrgs = PrismaOrgsMapper.toDomain({
+      prismaOrgs: orgs,
+    })
+
+    return mappedOrgs
+  }
+
+  async findByDomainAndNotSameId(
+    domain: string,
+    id: string,
+  ): Promise<Orgs | null> {
+    const prismaOrgs = await this.prisma.organization.findFirst({
+      where: { domain, id: { not: id } },
+    })
+
+    if (!prismaOrgs) return null
+
+    const orgs = prismaOrgs
+
+    const mappedOrgs = PrismaOrgsMapper.toDomain({
+      prismaOrgs: orgs,
+    })
+
+    return mappedOrgs
+  }
+
+  async transferOwnership(org: Orgs, newOwnerId: string): Promise<Orgs> {
+    const prismaOrgs = await this.prisma.organization.update({
+      where: { id: org.id.value },
+      data: {
+        ownerId: newOwnerId,
+      },
+    })
+
+    const mappedOrgs = PrismaOrgsMapper.toDomain({
+      prismaOrgs,
+    })
+
+    return mappedOrgs
+  }
+
   async findManyByUserId(userId: string): Promise<Orgs[]> {
     const prismaOrgs = await this.prisma.organization.findMany({
       where: { ownerId: userId },

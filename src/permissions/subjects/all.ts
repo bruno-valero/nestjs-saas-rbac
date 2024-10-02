@@ -11,7 +11,7 @@ export const allSubjectSchema = z.tuple([
     organizationPermissionsSchema,
     billingPermissionsSchema,
   ]),
-  z.literal('All'),
+  z.literal('all'),
 ])
 export type AllSubjects = [
   z.infer<typeof allSubjectSchema>[0],

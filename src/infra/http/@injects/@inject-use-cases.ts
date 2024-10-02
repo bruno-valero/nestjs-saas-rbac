@@ -9,7 +9,17 @@ import { CreateOrgUseCase } from '@orgs-use-cases/create-org-use-case'
 import { FetchOrgsUseCase } from '@orgs-use-cases/fetch-orgs-use-case'
 import { GetMembershipUseCase } from '@orgs-use-cases/get-membership-use-case'
 import { GetOrgUseCase } from '@orgs-use-cases/get-org-use-case'
-import { UpdateOrganizationUseCase } from '@orgs-use-cases/update-organization-use-case'
+import { DeleteMemberUseCase } from '@orgs-use-cases/members/delete-member-use-case'
+import { FetchMembersUseCase } from '@orgs-use-cases/members/fetch-members-use-case'
+import { UpdateMemberUseCase } from '@orgs-use-cases/members/update-member-use-case'
+import { CreateProjectUseCase } from '@orgs-use-cases/project/create-project-use-case'
+import { DeleteProjectUseCase } from '@orgs-use-cases/project/delete-project-use-case'
+import { FetchProjectsUseCase } from '@orgs-use-cases/project/fetch-projects-use-case'
+import { GetProjectDetailsUseCase } from '@orgs-use-cases/project/get-project-details-use-case'
+import { UpdateProjectUseCase } from '@orgs-use-cases/project/update-project-use-case'
+import { ShutdownOrgUseCase } from '@orgs-use-cases/shutdown-org-use-case'
+import { TransferOrgOwnershipUseCase } from '@orgs-use-cases/transfer-org-ownership-use-case'
+import { UpdateOrgUseCase } from '@orgs-use-cases/update-org-use-case'
 
 const coreUseCases: Provider[] = [
   // core
@@ -31,11 +41,31 @@ const orgsUseCases: Provider[] = [
   GetMembershipUseCase,
   GetOrgUseCase,
   FetchOrgsUseCase,
-  UpdateOrganizationUseCase,
+  UpdateOrgUseCase,
+  ShutdownOrgUseCase,
+  TransferOrgOwnershipUseCase,
+]
+
+const projectUseCases: Provider[] = [
+  // project
+  CreateProjectUseCase,
+  DeleteProjectUseCase,
+  GetProjectDetailsUseCase,
+  FetchProjectsUseCase,
+  UpdateProjectUseCase,
+  DeleteMemberUseCase,
+]
+
+const membersUseCases: Provider[] = [
+  // members
+  FetchMembersUseCase,
+  UpdateMemberUseCase,
 ]
 
 export const injectUseCases: Provider[] = [
   ...coreUseCases,
   ...authUseCases,
   ...orgsUseCases,
+  ...projectUseCases,
+  ...membersUseCases,
 ]

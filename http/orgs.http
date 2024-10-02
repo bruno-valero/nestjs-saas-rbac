@@ -10,7 +10,7 @@ POST {{authUrl}}/sign-up
 Content-Type: application/json
 
 {
-  "email": "bruno@valero.com",
+  "email": "biel@valero.com",
   "password": "12345678"
 }
 
@@ -59,8 +59,14 @@ Content-Type: application/json
 {
   "name": "valero",
   "url": "https://valero.com",
-  "description": "Organization 1",
+  "description": "my new description 2",
   "domain": "valero.com",
   "shouldAttachUsersByDomain": true,
   "avatarUrl": "https://valero.com/avatar.png"
 }
+
+
+### Delete Org
+# @name deleteOrg
+DELETE {{orgsUrl}}/valero
+Authorization: Bearer {{token}}

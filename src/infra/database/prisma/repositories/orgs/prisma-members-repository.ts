@@ -62,9 +62,82 @@ export class PrismaMembersRepository implements MembersRepository {
     return mappedMember
   }
 
+  async findByOrgAndUserEmail(
+    orgId: string,
+    email: string,
+  ): Promise<Member | null> {
+    const prismaMember = await this.prisma.member.findFirst({
+      where: {
+        user: {
+          email,
+        },
+        organizationId: orgId,
+      },
+      select: {
+        id: true,
+        userId: true,
+        organizationId: true,
+        createdAt: true,
+        updatedAt: true,
+        roles: {
+          select: {
+            role: true,
+          },
+        },
+      },
+    })
+
+    if (!prismaMember) return null
+
+    const mappedMember = PrismaMemberMapper.toDomain(prismaMember)
+    return mappedMember
+  }
+
+  async findManyByUserEmail(email: string): Promise<Member[]> {
+    const prismaMembers = await this.prisma.member.findMany({
+      where: { user: { email } },
+      select: {
+        id: true,
+        userId: true,
+        organizationId: true,
+        createdAt: true,
+        updatedAt: true,
+        roles: {
+          select: {
+            role: true,
+          },
+        },
+      },
+    })
+
+    const mappedMembers = prismaMembers.map(PrismaMemberMapper.toDomain)
+    return mappedMembers
+  }
+
   async findManyByUserId(userId: string): Promise<Member[]> {
     const prismaMembers = await this.prisma.member.findMany({
       where: { userId },
+      select: {
+        id: true,
+        userId: true,
+        organizationId: true,
+        createdAt: true,
+        updatedAt: true,
+        roles: {
+          select: {
+            role: true,
+          },
+        },
+      },
+    })
+
+    const mappedMembers = prismaMembers.map(PrismaMemberMapper.toDomain)
+    return mappedMembers
+  }
+
+  async findManyByOrgId(orgId: string): Promise<Member[]> {
+    const prismaMembers = await this.prisma.member.findMany({
+      where: { organizationId: orgId },
       select: {
         id: true,
         userId: true,

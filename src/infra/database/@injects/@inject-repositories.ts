@@ -10,11 +10,15 @@ import { PrismaAuthUserRepository } from '@database/prisma/repositories/auth/pri
 import { PrismaBaseUsersRepository } from '@database/prisma/repositories/orgs/prisma-base-users-repository'
 import { PrismaMembersRepository } from '@database/prisma/repositories/orgs/prisma-members-repository'
 import { PrismaOrgsRepository } from '@database/prisma/repositories/orgs/prisma-orgs-repository'
+import { PrismaProjectsRepository } from '@database/prisma/repositories/orgs/prisma-projects-repository'
+import { PrismaRoleItemRepository } from '@database/prisma/repositories/orgs/prisma-role-item-repository'
 import { PrismaTokensRepository } from '@database/prisma/repositories/prisma-tokens-repository'
 import { ModuleMetadata, Provider } from '@nestjs/common'
 import { BaseUsersRepository } from '@orgs-repositories/base-users-repository'
 import { MembersRepository } from '@orgs-repositories/members-repository'
 import { OrgsRepository } from '@orgs-repositories/orgs-repository'
+import { ProjectsRepository } from '@orgs-repositories/projects-repository'
+import { RoleItemRepository } from '@orgs-repositories/role-item-repository'
 
 const coreRepositories: Provider[] = [
   // core
@@ -33,6 +37,8 @@ const orgsRepositories: Provider[] = [
   { provide: BaseUsersRepository, useClass: PrismaBaseUsersRepository },
   { provide: OrgsRepository, useClass: PrismaOrgsRepository },
   { provide: MembersRepository, useClass: PrismaMembersRepository },
+  { provide: ProjectsRepository, useClass: PrismaProjectsRepository },
+  { provide: RoleItemRepository, useClass: PrismaRoleItemRepository },
 ]
 
 export const injectRepositories: Provider[] = [
@@ -53,4 +59,6 @@ export const exportsRepositories: NonNullable<ModuleMetadata['exports']> = [
   BaseUsersRepository,
   OrgsRepository,
   MembersRepository,
+  ProjectsRepository,
+  RoleItemRepository,
 ]

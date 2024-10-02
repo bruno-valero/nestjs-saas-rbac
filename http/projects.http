@@ -1,0 +1,62 @@
+@baseUrl = http://localhost:3333
+@authUrl = {{baseUrl}}/auth
+@orgsUrl = {{baseUrl}}/orgs
+
+@token = {{singUp.response.body.token}}
+
+### Sign Up
+# @name singUp
+POST {{authUrl}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "biel@valero.com",
+  "password": "12345678"
+}
+
+
+### Create Project
+# @name createProject
+POST {{orgsUrl}}/valero/projects
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "My First Project teste",
+  "url": "https://meyproject.com",
+  "description": "my new description",
+  "avatarUrl": "https://valero.com/avatar.png"
+}
+
+
+### Get Project
+# @name getProject
+GET {{orgsUrl}}/valero/projects/my-first-project
+Authorization: Bearer {{token}}
+
+
+### Fetch Projects
+# @name fetchProjects
+GET {{orgsUrl}}/valero/projects
+Authorization: Bearer {{token}}
+
+
+
+### Update Project
+# @name updateProject
+PATCH {{orgsUrl}}/valero/projects/my-first-project
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "My Updated Project",
+  "url": "https://updated.com",
+  "description": "my new update",
+  "avatarUrl": "https://valero.com/update.png"
+}
+
+
+### Delete Project
+# @name deleteProject
+DELETE {{orgsUrl}}/valero/projects/my-first-project
+Authorization: Bearer {{token}}
