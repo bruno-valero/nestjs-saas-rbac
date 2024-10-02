@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "Roles" ADD VALUE 'ANONYMOUS';

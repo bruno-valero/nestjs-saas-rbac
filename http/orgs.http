@@ -1,0 +1,66 @@
+@baseUrl = http://localhost:3333
+@authUrl = {{baseUrl}}/auth
+@orgsUrl = {{baseUrl}}/orgs
+
+@token = {{singUp.response.body.token}}
+
+### Sign Up
+# @name singUp
+POST {{authUrl}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "bruno@valero.com",
+  "password": "12345678"
+}
+
+
+### Create Org
+# @name createOrg
+POST {{orgsUrl}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "valero",
+  "url": "https://valero.com",
+  "description": "Organization 1",
+  "slug": "valero",
+  "domain": "valero.com",
+  "shouldAttachUsersByDomain": true,
+  "avatarUrl": "https://valero.com/avatar.png"
+}
+
+
+### Get Membership
+# @name getMembership
+GET {{orgsUrl}}/valero/membership
+Authorization: Bearer {{token}}
+
+
+### Get Org
+# @name getOrg
+GET {{orgsUrl}}/valero
+Authorization: Bearer {{token}}
+
+
+### Fetch Orgs
+# @name fetchOrgs
+GET {{orgsUrl}}
+Authorization: Bearer {{token}}
+
+
+### Update Organization
+# @name updateOrganization
+PATCH {{orgsUrl}}/valero
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "valero",
+  "url": "https://valero.com",
+  "description": "Organization 1",
+  "domain": "valero.com",
+  "shouldAttachUsersByDomain": true,
+  "avatarUrl": "https://valero.com/avatar.png"
+}

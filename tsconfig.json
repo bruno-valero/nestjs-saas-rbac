@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "module": "node16",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",    
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@/*": ["src/*"],
+      // ------ infra ------
+      "@env/*": ["src/infra/env/*"],
+      "@infra/*": ["src/infra/*"],
+      "@database/*": ["src/infra/database/*"],
+      "@auth/*": ["src/infra/auth/*"],
+      "@cache/*": ["src/infra/cache/*"],
+      "@http/*": ["src/infra/http/*"],
+      "@pipes/*": ["src/infra/pipes/*"],
+      "@controllers/*": ["src/infra/http/controllers/*"],
+      // ------ domain-driven-design ------
+      "@core/*": ["src/domain-driven-design/core/*"],
+      // organizations domain
+      "@orgs-use-cases/*": ["src/domain-driven-design/domains/organizations/application/use-cases/*"],
+      "@orgs-repositories/*": ["src/domain-driven-design/domains/organizations/application/repositories/*"],
+      "@orgs-entities/*": ["src/domain-driven-design/domains/organizations/enterprise/entities/*"],
+      "@orgs-value-objects/*": ["src/domain-driven-design/domains/organizations/enterprise/entities/value-objects/*"],
+      "@orgs-events/*": ["src/domain-driven-design/domains/organizations/enterprise/events/*"],
+      // authentication domain
+      "@auth-use-cases/*": ["src/domain-driven-design/domains/auth/application/use-cases/*"],
+      "@auth-repositories/*": ["src/domain-driven-design/domains/auth/application/repositories/*"],
+      "@auth-criptography/*": ["src/domain-driven-design/domains/auth/application/criptography/*"],
+      "@auth-entities/*": ["src/domain-driven-design/domains/auth/enterprise/entities/*"],
+      "@auth-events/*": ["src/domain-driven-design/domains/auth/enterprise/events/*"],
+      // ------ permissions ------
+      "@permissions/*": ["src/permissions/*"],
+    },
+    "types": [
+      "vitest/globals",      
+    ]
+  }
+}

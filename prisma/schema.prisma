@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Roles {
+  ADMIN
+  MEMBER
+  BILLING
+}
+
+model Role {
+  id       Int    @id @default(autoincrement())
+  memberId String
+  role     Roles
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, role])
+  @@map("roles")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  name         String?
+  passwordHash String?   @map("password_hash")
+  avatarUrl    String?   @map("avatar_url")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime? @updatedAt @map("updated_at")
+
+  memberOn     Member[]
+  tokens       Token[]
+  accounts     Account[]
+  invites      Invite[]
+  Organization Organization[] @relation("owner")
+
+  @@map("users")
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("tokens")
+}
+
+enum AccountProvider {
+  GITHUB
+}
+
+model Account {
+  id                String          @id @default(uuid())
+  provider          AccountProvider
+  providerAccountId String          @unique @map("provider_account_id")
+  userId            String          @map("user_id")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@unique([provider, userId])
+  @@map("accounts")
+}
+
+model Invite {
+  id             String   @id @default(uuid())
+  authrorId      String?  @map("authror_id")
+  organizationId String   @map("organization_id")
+  email          String
+  role           Roles
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  authror      User?        @relation(fields: [authrorId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, email])
+  @@index([email])
+  @@map("invites")
+}
+
+model Member {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  organizationId String    @map("organization_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime? @updatedAt @map("updated_at")
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation("members", fields: [organizationId], references: [id], onDelete: Cascade)
+
+  roles        Role[]
+  ownsProjects Project[] @relation("owner")
+
+  @@unique([userId, organizationId])
+  @@map("members")
+}
+
+model Organization {
+  id                        String    @id @default(uuid())
+  ownerId                   String    @map("owner_id")
+  name                      String
+  url                       String
+  description               String
+  slug                      String    @unique
+  domain                    String?   @unique
+  shouldAttachUsersByDomain Boolean   @default(false) @map("should_attach_users_by_domain")
+  avatarUrl                 String?   @map("avatar_url")
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt                 DateTime? @updatedAt @map("updated_at")
+
+  owner User @relation("owner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  members  Member[]  @relation("members")
+  projects Project[]
+  invites  Invite[]
+
+  @@map("organizations")
+}
+
+model Project {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  ownerId        String    @map("owner_id")
+  name           String
+  url            String
+  description    String
+  slug           String    @unique
+  avatarUrl      String?   @map("avatar_url")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime? @updatedAt @map("updated_at")
+
+  owner        Member       @relation("owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("projects")
+}

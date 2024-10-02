@@ -1,0 +1,60 @@
+@baseUrl = http://localhost:3333
+@authUrl = {{baseUrl}}/auth
+
+@token = {{singUp.response.body.token}}
+
+### Sign In
+POST {{authUrl}}/sign-in
+Content-Type: application/json
+
+{
+  "email": "biel@valero.com",
+  "name": "Bruno Valero",
+  "password": "12345678"
+}
+
+### Sign Up
+# @name singUp
+POST {{authUrl}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "bruno@valero.com",
+  "password": "12345678"
+}
+
+### Sign Out
+POST {{authUrl}}/sign-out
+Content-Type: application/json
+
+{
+  "email": "bruno@valero.com",
+  "password": "123456"
+}
+
+### Profile
+# @name profile
+GET {{authUrl}}/profile
+Authorization: Bearer {{token}}
+
+
+
+### Recover Password
+# @name recoverPassword
+POST {{authUrl}}/recover-password
+Content-Type: application/json
+
+{
+  "email": "bruno@valero.com"
+}
+
+
+### Reset Password
+# @name resetPassword
+PATCH {{authUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "password": "bruno fernandes", 
+  "token": "cd5538fc-9701-424e-91a8-a5f05b699e26"
+}

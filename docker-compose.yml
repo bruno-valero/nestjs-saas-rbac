@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  postgres:
+    container_name: nest-example-postgres
+    image: bitnami/postgresql
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: nest-example
+  redis:
+    container_name: nest-example-redis
+    image: bitnami/redis
+    ports:
+      - 6379:6379
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
