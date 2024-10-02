@@ -1,0 +1,39 @@
+@baseUrl = http://localhost:3333
+@authUrl = {{baseUrl}}/auth
+@orgsUrl = {{baseUrl}}/orgs
+
+@token = {{singUp.response.body.token}}
+
+### Sign Up
+# @name singUp
+POST {{authUrl}}/sign-up
+Content-Type: application/json
+
+{
+  "email": "biel@valero.com",
+  "password": "12345678"
+}
+
+
+### Fetch Members
+# @name fetchMembers
+GET {{orgsUrl}}/valero/members
+Authorization: Bearer {{token}}
+
+
+### Update Member
+# @name updateMember
+PATCH {{orgsUrl}}/valero/members/94d1db88-1370-4079-abe6-2ce5312b1870
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    
+  "role": ["ADMIN"]
+}
+
+
+### Delete Member
+# @name deleteMember
+DELETE {{orgsUrl}}/valero/members/94d1db88-1370-4079-abe6-2ce5312b1870
+Authorization: Bearer {{token}}

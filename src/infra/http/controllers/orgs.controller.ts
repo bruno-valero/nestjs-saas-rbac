@@ -7,6 +7,7 @@ import { OrgsPresenter } from '@http/presenters/orgs/orgs-presenter'
 import {
   Body,
   Controller,
+  Delete,
   Get,
   InternalServerErrorException,
   NotFoundException,
@@ -19,9 +20,11 @@ import { CreateOrgUseCase } from '@orgs-use-cases/create-org-use-case'
 import { FetchOrgsUseCase } from '@orgs-use-cases/fetch-orgs-use-case'
 import { GetMembershipUseCase } from '@orgs-use-cases/get-membership-use-case'
 import { GetOrgUseCase } from '@orgs-use-cases/get-org-use-case'
-import { UpdateOrganizationUseCase } from '@orgs-use-cases/update-organization-use-case'
+import { ShutdownOrgUseCase } from '@orgs-use-cases/shutdown-org-use-case'
 import { ZodValidationPipe } from '@pipes/zod-validation-pipe'
 import z from 'zod'
+
+import { UpdateOrgUseCase } from '@/domain-driven-design/domains/organizations/application/use-cases/update-org-use-case'
 
 // -------------- createOrg --------------
 const createOrgSchema = z.object({
@@ -55,7 +58,8 @@ export class OrgsController {
     private readonly getMembershipUseCase: GetMembershipUseCase,
     private readonly getOrgUseCase: GetOrgUseCase,
     private readonly fetchOrgsUseCase: FetchOrgsUseCase,
-    private readonly updateOrganizationUseCase: UpdateOrganizationUseCase,
+    private readonly updateOrgUseCase: UpdateOrgUseCase,
+    private readonly shutdownOrgUseCase: ShutdownOrgUseCase,
   ) {}
 
   @Post()
@@ -159,7 +163,7 @@ export class OrgsController {
     @Param('orgSlug') orgSlug: string,
     @Body(updateOrganizationPype) body: UpdateOrganizationProps,
   ) {
-    const resp = await this.updateOrganizationUseCase.execute({
+    const resp = await this.updateOrgUseCase.execute({
       orgSlug,
       userId: user.sub,
       updateOptions: body,
@@ -179,6 +183,35 @@ export class OrgsController {
     if (resp.isRight()) {
       const { org } = resp.value
       return OrgsPresenter.basic(org)
+    }
+
+    return new InternalServerErrorException()
+  }
+
+  @Delete('/:orgSlug')
+  async deleteOrg(
+    @CurrentUser() user: TokenPayload,
+    @Param('orgSlug') orgSlug: string,
+  ) {
+    const resp = await this.shutdownOrgUseCase.execute({
+      orgSlug,
+      userId: user.sub,
+    })
+
+    if (resp.isLeft()) {
+      const value = resp.value
+      if (value instanceof UnauthorizedError) {
+        return new UnauthorizedException({ message: value.message })
+      }
+
+      if (value instanceof ResourceNotFoundError) {
+        return new NotFoundException({ message: value.message })
+      }
+    }
+
+    if (resp.isRight()) {
+      const { deleted } = resp.value
+      return { deleted }
     }
 
     return new InternalServerErrorException()

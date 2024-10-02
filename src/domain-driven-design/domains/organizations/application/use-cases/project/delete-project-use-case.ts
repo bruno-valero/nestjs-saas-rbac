@@ -2,38 +2,32 @@ import { Either, left, right } from '@core/either'
 import { ResourceNotFoundError } from '@core/errors/errors/resource-not-found-error'
 import { UnauthorizedError } from '@core/errors/errors/unauthorized-error'
 import { Injectable } from '@nestjs/common'
-import { Orgs } from '@orgs-entities/orgs'
 import { MembersRepository } from '@orgs-repositories/members-repository'
 import { OrgsRepository } from '@orgs-repositories/orgs-repository'
+import { ProjectsRepository } from '@orgs-repositories/projects-repository'
 
-interface UpdateOrganizationUseCaseRequest {
-  orgSlug: string
+interface DeleteProjectUseCaseRequest {
   userId: string
-  updateOptions: {
-    name?: string
-    url?: string
-    description?: string
-    domain?: string
-    shouldAttachUsersByDomain?: boolean
-    avatarUrl?: string
-  }
+  orgSlug: string
+  projectSlug: string
 }
 
-type UpdateOrganizationUseCaseResponse = Either<
+type DeleteProjectUseCaseResponse = Either<
   UnauthorizedError | ResourceNotFoundError,
-  { org: Orgs }
+  { deleted: true }
 >
 
 @Injectable()
-export class UpdateOrganizationUseCase {
+export class DeleteProjectUseCase {
   constructor(
     private readonly orgsRepository: OrgsRepository,
     private readonly membersRepository: MembersRepository,
+    private readonly projectsRepository: ProjectsRepository,
   ) {}
 
   async execute(
-    props: UpdateOrganizationUseCaseRequest,
-  ): Promise<UpdateOrganizationUseCaseResponse> {
+    props: DeleteProjectUseCaseRequest,
+  ): Promise<DeleteProjectUseCaseResponse> {
     const org = await this.orgsRepository.findBySlug(props.orgSlug)
 
     if (!org) {
@@ -51,10 +45,19 @@ export class UpdateOrganizationUseCase {
       return left(new UnauthorizedError())
     }
 
-    const hasPermission = member.hasPermission('update', {
-      __typeName: 'Organization',
-      id: org.id.value,
-      ownerId: props.userId,
+    const project = await this.projectsRepository.findBySlugAndOrgId(
+      props.projectSlug,
+      org.id.value,
+    )
+
+    if (!project) {
+      return left(new ResourceNotFoundError())
+    }
+
+    const hasPermission = member.hasPermission('delete', {
+      __typeName: 'Project',
+      id: project.id.value,
+      ownerId: org.ownerId,
     })
 
     console.log(`hasPermission: ${hasPermission}`)
@@ -63,24 +66,8 @@ export class UpdateOrganizationUseCase {
       return left(new UnauthorizedError())
     }
 
-    const {
-      name,
-      url,
-      description,
-      domain,
-      shouldAttachUsersByDomain,
-      avatarUrl,
-    } = props.updateOptions
+    await this.projectsRepository.delete(project)
 
-    org.url = url ?? org.url
-    org.description = description ?? org.description
-    org.domain = domain ?? org.domain
-    org.shouldAttachUsersByDomain =
-      shouldAttachUsersByDomain ?? org.shouldAttachUsersByDomain
-    org.avatarUrl = avatarUrl ?? org.avatarUrl
-    org.name = name ?? org.name
-
-    await this.orgsRepository.update(org)
-    return right({ org })
+    return right({ deleted: true })
   }
 }

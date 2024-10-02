@@ -66,11 +66,16 @@ export class Member extends Entity<MemberProps> {
 
   switchRole(role: Role[]) {
     const { role: currentRole } = { ...this.props }
+
+    const removedRoles = currentRole.filter(
+      (currRole) => !role.includes(currRole),
+    )
+    const addedRoles = role.filter(
+      (currRole) => !currentRole.includes(currRole),
+    )
+
     this.props.role = role
     this.touch()
-
-    const removedRoles = currentRole.filter((role) => !role.includes(role))
-    const addedRoles = this.props.role.filter((role) => !role.includes(role))
 
     return { removedRoles, addedRoles }
   }
@@ -82,11 +87,15 @@ export class Member extends Entity<MemberProps> {
       // eslint-disable-next-line
       // @ts-ignore
       const abiliy = defineAbilityFor({ role, id: this.userId.value })
-
-      return abiliy.can(action as 'create', subject)
+      const permission = abiliy.can(action as 'create', subject)
+      // console.log('role', role)
+      // console.log('action', action)
+      // console.log('subject', JSON.stringify(subject, null, 2))
+      // console.log('permission', permission)
+      return permission
     })
 
-    const hasPermission = !permissions.some((permission) => !permission)
+    const hasPermission = permissions.some((permission) => permission)
 
     return hasPermission
   }
