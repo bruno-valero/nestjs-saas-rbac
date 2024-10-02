@@ -2,6 +2,12 @@
 
 Boilerplate for a multitenant SaaS application with Nodejs, Nextjs and Postgres.
 
+## Setup Nestjs
+
+See how to setup Nestjs with **Fastify** in [@bruno-valero/nestjs-with-fastify-setup](https://gist.github.com/bruno-valero/f1cc806044527a1a7e41895c139a5acd)
+
+See how to setup Nestjs with **auth Jwt**, **prisma ORM** and **Redis** for cache in [@bruno-valero/ nestjs-setup-with-auth-and-prisma-and-redis](https://gist.github.com/bruno-valero/9aa864c210fcb191da66cc9dbb4523d5)
+
 ## Features
 
 - Multitenant
