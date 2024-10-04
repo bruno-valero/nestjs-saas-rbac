@@ -29,7 +29,14 @@ export class PrismaAuthOrgsRepository implements AuthOrgsRepository {
     const org = prismaOrg
 
     const mappedOrg = PrismaAuthOrgMapper.toDomain({
-      prismaOrg: org,
+      prismaOrg: {
+        domain: org.domain ?? '',
+        id: org.id,
+        name: org.name,
+        ownerId: org.ownerId,
+        shouldAttachUsersByDomain: org.shouldAttachUsersByDomain,
+        url: org.url,
+      },
     })
 
     return mappedOrg
@@ -45,7 +52,14 @@ export class PrismaAuthOrgsRepository implements AuthOrgsRepository {
     const org = prismaOrg
 
     const mappedOrg = PrismaAuthOrgMapper.toDomain({
-      prismaOrg: org,
+      prismaOrg: {
+        domain: org.domain ?? '',
+        id: org.id,
+        name: org.name,
+        ownerId: org.ownerId,
+        shouldAttachUsersByDomain: org.shouldAttachUsersByDomain,
+        url: org.url,
+      },
     })
 
     return mappedOrg
@@ -60,7 +74,14 @@ export class PrismaAuthOrgsRepository implements AuthOrgsRepository {
 
     const mappedOrgs = orgs.map((org) =>
       PrismaAuthOrgMapper.toDomain({
-        prismaOrg: org,
+        prismaOrg: {
+          domain: org.domain ?? '',
+          id: org.id,
+          name: org.name,
+          ownerId: org.ownerId,
+          shouldAttachUsersByDomain: org.shouldAttachUsersByDomain,
+          url: org.url,
+        },
       }),
     )
 

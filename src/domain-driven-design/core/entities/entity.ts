@@ -18,4 +18,8 @@ export default abstract class Entity<Props> {
     if (entity.id === this.id) return true
     return false
   }
+
+  abstract toObject(): unknown
+
+  abstract toJSON(ident?: number): string
 }

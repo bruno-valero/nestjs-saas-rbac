@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Member } from '@orgs-entities/member'
+import { Role } from '@permissions/permissions'
 
 @Injectable()
 export abstract class MembersRepository {
@@ -15,8 +16,13 @@ export abstract class MembersRepository {
   ): Promise<Member | null>
 
   abstract findManyByUserEmail(email: string): Promise<Member[]>
-
+  abstract countByUserEmail(email: string): Promise<number>
   abstract findManyByOrgId(orgId: string): Promise<Member[]>
+  abstract countByOrgIdExcludingRoles(
+    orgId: string,
+    roles: Role[],
+  ): Promise<number>
+
   abstract findManyByUserId(userId: string): Promise<Member[]>
   abstract create(props: Member): Promise<Member>
   abstract update(props: Member): Promise<Member>

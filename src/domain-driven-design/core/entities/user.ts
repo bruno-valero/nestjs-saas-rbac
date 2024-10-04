@@ -108,7 +108,4 @@ export abstract class User extends Entity<UserProps> {
 
     return hasPermission
   }
-
-  abstract toObject(): UserProps & { id: string }
-  abstract toJSON(): string
 }

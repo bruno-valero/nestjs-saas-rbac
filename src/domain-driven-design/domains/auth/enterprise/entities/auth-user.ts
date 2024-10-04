@@ -28,8 +28,8 @@ export class AuthUser extends User {
     return object
   }
 
-  toJSON() {
-    const json = JSON.stringify(this.toObject())
+  toJSON(ident?: number) {
+    const json = JSON.stringify(this.toObject(), null, ident)
     return json
   }
 }

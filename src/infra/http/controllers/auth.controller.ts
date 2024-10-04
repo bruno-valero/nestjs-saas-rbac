@@ -6,8 +6,20 @@ import { CreateAccountUseCase } from '@auth-use-cases/create-account-use-case'
 import { GetAuthProfileUseCase } from '@auth-use-cases/get-auth-profile-use-case'
 import { RecoverPasswordRequestUseCase } from '@auth-use-cases/recover-password-request-use-case'
 import { ResetPasswordUseCase } from '@auth-use-cases/reset-password-use-case'
+import {
+  RecoverPasswordPropsDto,
+  recoverPasswordPype,
+  ResetPasswordPropsDto,
+  resetPasswordPype,
+  SignInPropsDto,
+  signInPype,
+  SignUpPropsDto,
+  signUpPype,
+} from '@controllers/auth-controller.dto'
 import { ResourceNotFoundError } from '@core/errors/errors/resource-not-found-error'
 import { UnauthorizedError } from '@core/errors/errors/unauthorized-error'
+import { AuthProfilePresenter } from '@http/presenters/auth/auth-profile-presenter'
+import { AuthUserPresenter } from '@http/presenters/auth/auth-user-presenter'
 import {
   BadRequestException,
   Body,
@@ -20,48 +32,9 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common'
-import { ZodValidationPipe } from '@pipes/zod-validation-pipe'
-import z from 'zod'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
-import { AuthProfilePresenter } from '@/infra/http/presenters/auth/auth-profile-presenter'
-import { AuthUserPresenter } from '@/infra/http/presenters/auth/auth-user-presenter'
-
-// -------------- signIn --------------
-const signInSchema = z.object({
-  email: z.string().email(),
-  name: z.string(),
-  password: z.string().min(8),
-})
-
-const signInPype = new ZodValidationPipe(signInSchema)
-type SignInProps = z.infer<typeof signInSchema>
-
-// -------------- signUp --------------
-const signUpSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-})
-
-const signUpPype = new ZodValidationPipe(signUpSchema)
-type SignUpProps = z.infer<typeof signUpSchema>
-
-// -------------- recoverPassword --------------
-const recoverPasswordSchema = z.object({
-  email: z.string().email(),
-})
-
-const recoverPasswordPype = new ZodValidationPipe(recoverPasswordSchema)
-type RecoverPasswordProps = z.infer<typeof recoverPasswordSchema>
-
-// -------------- resetPassword --------------
-const resetPasswordSchema = z.object({
-  password: z.string().min(8),
-  token: z.string(),
-})
-
-const resetPasswordPype = new ZodValidationPipe(resetPasswordSchema)
-type ResetPasswordProps = z.infer<typeof resetPasswordSchema>
-
+@ApiTags('Auth')
 @Controller('/auth')
 export class AuthController {
   constructor(
@@ -74,11 +47,13 @@ export class AuthController {
 
   @Post('/sign-in')
   @Public()
-  async createAccount(@Body(signInPype) body: SignInProps) {
+  async createAccount(@Body(signInPype) body: SignInPropsDto) {
+    console.log('body', body)
     const resp = await this.createAccountUseCase.execute(body)
 
     if (resp.isLeft()) {
       const value = resp.value
+      console.log('isLeft value', value)
       return new ConflictException({ message: value.message })
     }
 
@@ -92,7 +67,7 @@ export class AuthController {
 
   @Post('/sign-up')
   @Public()
-  async login(@Body(signUpPype) body: SignUpProps) {
+  async login(@Body(signUpPype) body: SignUpPropsDto) {
     const resp = await this.authWithPasswordUseCase.execute(body)
 
     if (resp.isLeft()) {
@@ -118,6 +93,7 @@ export class AuthController {
   }
 
   @Get('/profile')
+  @ApiBearerAuth('AUTH_ROUTE')
   async getProfile(@CurrentUser() user: TokenPayload) {
     const resp = await this.getAuthProfileUseCase.execute({
       userId: user.sub,
@@ -143,7 +119,9 @@ export class AuthController {
 
   @Post('/recover-password')
   @Public()
-  async recoverPassword(@Body(recoverPasswordPype) body: RecoverPasswordProps) {
+  async recoverPassword(
+    @Body(recoverPasswordPype) body: RecoverPasswordPropsDto,
+  ) {
     const resp = await this.recoverPasswordRequestUseCase.execute(body)
 
     if (resp.isLeft()) {
@@ -166,7 +144,7 @@ export class AuthController {
 
   @Patch('/reset-password')
   @Public()
-  async resetPassword(@Body(resetPasswordPype) body: ResetPasswordProps) {
+  async resetPassword(@Body(resetPasswordPype) body: ResetPasswordPropsDto) {
     const resp = await this.resetPasswordUseCase.execute(body)
 
     if (resp.isLeft()) {

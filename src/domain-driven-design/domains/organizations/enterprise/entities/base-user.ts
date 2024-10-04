@@ -2,7 +2,7 @@ import UniqueEntityId from '@core/entities/unique-entity-id'
 import { User, UserCreateProps } from '@core/entities/user'
 
 export class BaseUser extends User {
-  static create(props: UserCreateProps, id?: string): User {
+  static create(props: UserCreateProps, id?: string): BaseUser {
     const user = new BaseUser(
       {
         ...props,
@@ -27,8 +27,8 @@ export class BaseUser extends User {
     return object
   }
 
-  toJSON() {
-    const json = JSON.stringify(this.toObject())
+  toJSON(ident?: number) {
+    const json = JSON.stringify(this.toObject(), null, ident)
     return json
   }
 }

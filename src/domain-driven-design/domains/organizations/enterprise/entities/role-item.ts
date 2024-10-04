@@ -41,8 +41,8 @@ export class RoleItem extends Entity<RoleItemProps> {
     }
   }
 
-  tojson() {
-    const json = JSON.stringify(this.toObject())
+  toJSON(ident?: number) {
+    const json = JSON.stringify(this.toObject(), null, ident)
     return json
   }
 }

@@ -1,5 +1,11 @@
 import { CurrentUser } from '@auth/current-user-decorator'
 import { TokenPayload } from '@auth/jwt.strategy'
+import {
+  CreateProjectPropsDto,
+  createProjectPype,
+  UpdateProjectPropsDto,
+  updateProjectPype,
+} from '@controllers/project-controller.dto'
 import { DuplicatedResourceError } from '@core/errors/errors/duplicated-resource-error'
 import { ResourceNotFoundError } from '@core/errors/errors/resource-not-found-error'
 import { UnauthorizedError } from '@core/errors/errors/unauthorized-error'
@@ -20,35 +26,14 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { CreateProjectUseCase } from '@orgs-use-cases/project/create-project-use-case'
 import { DeleteProjectUseCase } from '@orgs-use-cases/project/delete-project-use-case'
 import { FetchProjectsUseCase } from '@orgs-use-cases/project/fetch-projects-use-case'
 import { GetProjectDetailsUseCase } from '@orgs-use-cases/project/get-project-details-use-case'
 import { UpdateProjectUseCase } from '@orgs-use-cases/project/update-project-use-case'
-import { ZodValidationPipe } from '@pipes/zod-validation-pipe'
-import z from 'zod'
 
-// -------------- createProject --------------
-const createProjectSchema = z.object({
-  name: z.string(),
-  url: z.string().url(),
-  description: z.string(),
-  slug: z.string().optional(),
-  avatarUrl: z.string().url().optional(),
-})
-const createProjectPype = new ZodValidationPipe(createProjectSchema)
-type CreateProjectProps = z.infer<typeof createProjectSchema>
-
-// -------------- updateProject --------------
-const updateProjectSchema = z.object({
-  name: z.string().optional(),
-  url: z.string().url().optional(),
-  description: z.string().optional(),
-  avatarUrl: z.string().url().optional(),
-})
-const updateProjectPype = new ZodValidationPipe(updateProjectSchema)
-type UpdateProjectProps = z.infer<typeof updateProjectSchema>
-
+@ApiTags('Projects')
 @Controller('/orgs/:orgSlug/projects')
 export class ProjectController {
   constructor(
@@ -60,10 +45,11 @@ export class ProjectController {
   ) {}
 
   @Post()
+  @ApiBearerAuth('AUTH_ROUTE')
   async createProject(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
-    @Body(createProjectPype) body: CreateProjectProps,
+    @Body(createProjectPype) body: CreateProjectPropsDto,
   ) {
     const resp = await this.createProjectUseCase.execute({
       ...body,
@@ -96,6 +82,7 @@ export class ProjectController {
   }
 
   @Delete('/:projectSlug')
+  @ApiBearerAuth('AUTH_ROUTE')
   async deleteProject(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
@@ -129,6 +116,7 @@ export class ProjectController {
   }
 
   @Get('/:projectSlug')
+  @ApiBearerAuth('AUTH_ROUTE')
   async getProject(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
@@ -166,6 +154,7 @@ export class ProjectController {
   }
 
   @Get()
+  @ApiBearerAuth('AUTH_ROUTE')
   async fetchProjects(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
@@ -197,11 +186,12 @@ export class ProjectController {
   }
 
   @Patch('/:projectSlug')
+  @ApiBearerAuth('AUTH_ROUTE')
   async updateProject(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
     @Param('projectSlug') projectSlug: string,
-    @Body(updateProjectPype) body: UpdateProjectProps,
+    @Body(updateProjectPype) body: UpdateProjectPropsDto,
   ) {
     const resp = await this.updateProjectUseCase.execute({
       projectSlug,
