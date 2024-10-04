@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common'
 import { Member } from '@orgs-entities/member'
 import { MembersRepository } from '@orgs-repositories/members-repository'
 
+import { Role } from '@/permissions/permissions'
+
 @Injectable()
 export class PrismaMembersRepository implements MembersRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -154,6 +156,40 @@ export class PrismaMembersRepository implements MembersRepository {
 
     const mappedMembers = prismaMembers.map(PrismaMemberMapper.toDomain)
     return mappedMembers
+  }
+
+  async countByOrgIdExcludingRoles(
+    orgId: string,
+    roles: Role[],
+  ): Promise<number> {
+    const prismaMembers = await this.prisma.member.count({
+      where: {
+        organizationId: orgId,
+        NOT: {
+          roles: {
+            some: {
+              role: {
+                in: roles.map((role) => role),
+              },
+            },
+          },
+        },
+      },
+    })
+
+    return prismaMembers
+  }
+
+  async countByUserEmail(email: string): Promise<number> {
+    const prismaMembers = await this.prisma.member.count({
+      where: {
+        user: {
+          email,
+        },
+      },
+    })
+
+    return prismaMembers
   }
 
   async create(props: Member): Promise<Member> {

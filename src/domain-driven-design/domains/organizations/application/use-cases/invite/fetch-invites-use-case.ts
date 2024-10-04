@@ -1,7 +1,9 @@
 import { Either, left, right } from '@core/either'
 import { ResourceNotFoundError } from '@core/errors/errors/resource-not-found-error'
 import { UnauthorizedError } from '@core/errors/errors/unauthorized-error'
+import { PickEntityKeys } from '@core/types/entity-utils'
 import { Injectable } from '@nestjs/common'
+import { BaseUser } from '@orgs-entities/base-user'
 import { OrgInvite } from '@orgs-entities/org-invite'
 import { MembersRepository } from '@orgs-repositories/members-repository'
 import { OrgInvitesRepository } from '@orgs-repositories/org-invites-repository'
@@ -12,9 +14,21 @@ interface FetchInvitesUseCaseRequest {
   orgSlug: string
 }
 
+type Fields = {
+  id: true
+  email: true
+  role: true
+  authorId: true
+  createdAt: true
+  author: {
+    id: true
+    name: true
+  }
+}
+
 type FetchInvitesUseCaseResponse = Either<
   UnauthorizedError | ResourceNotFoundError,
-  { invites: OrgInvite[] }
+  { invites: PickEntityKeys<Fields, OrgInvite & { author?: BaseUser }>[] }
 >
 
 @Injectable()
@@ -50,7 +64,21 @@ export class FetchInvitesUseCase {
       return left(new UnauthorizedError())
     }
 
-    const invites = await this.invitesRepository.findManyByOrgId(org.id.value)
+    // const invites = await this.invitesRepository.findManyByOrgId(org.id.value)
+    const invites = await this.invitesRepository.findManyByOrgIdChoosingFields(
+      org.id.value,
+      <Fields>{
+        id: true,
+        email: true,
+        role: true,
+        authorId: true,
+        createdAt: true,
+        author: {
+          id: true,
+          name: true,
+        },
+      },
+    )
 
     return right({ invites })
   }

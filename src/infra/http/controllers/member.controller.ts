@@ -1,5 +1,9 @@
 import { CurrentUser } from '@auth/current-user-decorator'
 import { TokenPayload } from '@auth/jwt.strategy'
+import {
+  UpdateMemberPropsDto,
+  updateMemberPype,
+} from '@controllers/member-controller.dto'
 import { ResourceNotFoundError } from '@core/errors/errors/resource-not-found-error'
 import { UnauthorizedError } from '@core/errors/errors/unauthorized-error'
 import { MemberPresenter } from '@http/presenters/orgs/member-presenter'
@@ -15,21 +19,12 @@ import {
   Patch,
   UnauthorizedException,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { DeleteMemberUseCase } from '@orgs-use-cases/members/delete-member-use-case'
 import { FetchMembersUseCase } from '@orgs-use-cases/members/fetch-members-use-case'
 import { UpdateMemberUseCase } from '@orgs-use-cases/members/update-member-use-case'
-import z from 'zod'
 
-import { ZodValidationPipe } from '@/infra/pipes/zod-validation-pipe'
-import { roleSchema } from '@/permissions/permissions'
-
-// -------------- updateMember --------------
-const updateMemberSchema = z.object({
-  role: z.array(roleSchema),
-})
-const updateMemberPype = new ZodValidationPipe(updateMemberSchema)
-type UpdateMemberProps = z.infer<typeof updateMemberSchema>
-
+@ApiTags('Members')
 @Controller('/orgs/:orgSlug/members')
 export class MemberController {
   constructor(
@@ -39,6 +34,7 @@ export class MemberController {
   ) {}
 
   @Get()
+  @ApiBearerAuth('AUTH_ROUTE')
   async fetchMembers(
     @Param('orgSlug') orgSlug: string,
     @CurrentUser() user: TokenPayload,
@@ -70,11 +66,12 @@ export class MemberController {
   }
 
   @Patch('/:memberId')
+  @ApiBearerAuth('AUTH_ROUTE')
   async updateMember(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
     @Param('memberId') memberId: string,
-    @Body(updateMemberPype) body: UpdateMemberProps,
+    @Body(updateMemberPype) body: UpdateMemberPropsDto,
   ) {
     const resp = await this.updateMemberUseCase.execute({
       userId: user.sub,
@@ -105,6 +102,7 @@ export class MemberController {
   }
 
   @Delete('/:memberId')
+  @ApiBearerAuth('AUTH_ROUTE')
   async deleteMember(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,

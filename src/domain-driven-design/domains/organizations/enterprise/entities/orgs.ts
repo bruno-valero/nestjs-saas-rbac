@@ -141,8 +141,8 @@ export class Orgs extends Entity<OrgsProps> {
     return object
   }
 
-  toJSON() {
-    const json = JSON.stringify(this.toObject())
+  toJSON(ident?: number) {
+    const json = JSON.stringify(this.toObject(), null, ident)
     return json
   }
 }

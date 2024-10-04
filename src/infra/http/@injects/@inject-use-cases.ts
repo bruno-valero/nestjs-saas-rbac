@@ -5,10 +5,17 @@ import { GetAuthProfileUseCase } from '@auth-use-cases/get-auth-profile-use-case
 import { RecoverPasswordRequestUseCase } from '@auth-use-cases/recover-password-request-use-case'
 import { ResetPasswordUseCase } from '@auth-use-cases/reset-password-use-case'
 import { Provider } from '@nestjs/common'
+import { GetOrgBillingUseCase } from '@orgs-use-cases/billing/get-org-billing-use-case'
 import { CreateOrgUseCase } from '@orgs-use-cases/create-org-use-case'
 import { FetchOrgsUseCase } from '@orgs-use-cases/fetch-orgs-use-case'
 import { GetMembershipUseCase } from '@orgs-use-cases/get-membership-use-case'
 import { GetOrgUseCase } from '@orgs-use-cases/get-org-use-case'
+import { AcceptInviteUseCase } from '@orgs-use-cases/invite/accept-invite-use-case'
+import { CreateInviteUseCase } from '@orgs-use-cases/invite/create-invite-use-case'
+import { DeleteInviteUseCase } from '@orgs-use-cases/invite/delete-invite-use-case'
+import { FetchInvitesUseCase } from '@orgs-use-cases/invite/fetch-invites-use-case'
+import { GetInviteDetailsUseCase } from '@orgs-use-cases/invite/get-invite-details-use-case'
+import { RejectInviteUseCase } from '@orgs-use-cases/invite/reject-invite-use-case'
 import { DeleteMemberUseCase } from '@orgs-use-cases/members/delete-member-use-case'
 import { FetchMembersUseCase } from '@orgs-use-cases/members/fetch-members-use-case'
 import { UpdateMemberUseCase } from '@orgs-use-cases/members/update-member-use-case'
@@ -62,10 +69,24 @@ const membersUseCases: Provider[] = [
   UpdateMemberUseCase,
 ]
 
+const invitesUseCases: Provider[] = [
+  // invites
+  GetInviteDetailsUseCase,
+  FetchInvitesUseCase,
+  CreateInviteUseCase,
+  AcceptInviteUseCase,
+  RejectInviteUseCase,
+  DeleteInviteUseCase,
+]
+
+const billingUseCases: Provider[] = [GetOrgBillingUseCase]
+
 export const injectUseCases: Provider[] = [
   ...coreUseCases,
   ...authUseCases,
   ...orgsUseCases,
   ...projectUseCases,
   ...membersUseCases,
+  ...invitesUseCases,
+  ...billingUseCases,
 ]

@@ -48,4 +48,9 @@ export class AuthMember extends Entity<AuthMemberProps> {
       role: this.role,
     }
   }
+
+  toJSON(ident?: number) {
+    const json = JSON.stringify(this.toObject(), null, ident)
+    return json
+  }
 }

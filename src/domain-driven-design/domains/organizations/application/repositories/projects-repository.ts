@@ -11,6 +11,8 @@ export abstract class ProjectsRepository {
   ): Promise<Project | null>
 
   abstract findManyByOrgId(orgId: string): Promise<Project[]>
+  abstract countByOrgId(orgId: string): Promise<number>
+
   abstract findManyByOwnerId(ownerId: string): Promise<Project[]>
   abstract findBySlug(slug: string): Promise<Project | null>
   abstract findBySlugAndNotSameId(

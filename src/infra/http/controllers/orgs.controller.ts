@@ -1,5 +1,11 @@
 import { CurrentUser } from '@auth/current-user-decorator'
 import { TokenPayload } from '@auth/jwt.strategy'
+import {
+  CreateOrgPropsDto,
+  createOrgPype,
+  UpdateOrganizationPropsDto,
+  updateOrganizationPype,
+} from '@controllers/orgs-controller.dto'
 import { ResourceNotFoundError } from '@core/errors/errors/resource-not-found-error'
 import { UnauthorizedError } from '@core/errors/errors/unauthorized-error'
 import { MemberPresenter } from '@http/presenters/orgs/member-presenter'
@@ -16,41 +22,16 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { CreateOrgUseCase } from '@orgs-use-cases/create-org-use-case'
 import { FetchOrgsUseCase } from '@orgs-use-cases/fetch-orgs-use-case'
 import { GetMembershipUseCase } from '@orgs-use-cases/get-membership-use-case'
 import { GetOrgUseCase } from '@orgs-use-cases/get-org-use-case'
 import { ShutdownOrgUseCase } from '@orgs-use-cases/shutdown-org-use-case'
-import { ZodValidationPipe } from '@pipes/zod-validation-pipe'
-import z from 'zod'
 
 import { UpdateOrgUseCase } from '@/domain-driven-design/domains/organizations/application/use-cases/update-org-use-case'
 
-// -------------- createOrg --------------
-const createOrgSchema = z.object({
-  name: z.string(),
-  url: z.string(),
-  description: z.string(),
-  slug: z.string().optional(),
-  domain: z.string(),
-  shouldAttachUsersByDomain: z.boolean(),
-  avatarUrl: z.string().nullable(),
-})
-const createOrgPype = new ZodValidationPipe(createOrgSchema)
-type CreateOrgProps = z.infer<typeof createOrgSchema>
-
-// -------------- updateOrganization --------------
-const updateOrganizationSchema = z.object({
-  name: z.string().optional(),
-  url: z.string().optional(),
-  description: z.string().optional(),
-  domain: z.string().optional(),
-  shouldAttachUsersByDomain: z.boolean().optional(),
-  avatarUrl: z.string().optional(),
-})
-const updateOrganizationPype = new ZodValidationPipe(updateOrganizationSchema)
-type UpdateOrganizationProps = z.infer<typeof updateOrganizationSchema>
-
+@ApiTags('Orgs')
 @Controller('/orgs')
 export class OrgsController {
   constructor(
@@ -63,9 +44,10 @@ export class OrgsController {
   ) {}
 
   @Post()
+  @ApiBearerAuth('AUTH_ROUTE')
   async createOrg(
     @CurrentUser() user: TokenPayload,
-    @Body(createOrgPype) body: CreateOrgProps,
+    @Body(createOrgPype) body: CreateOrgPropsDto,
   ) {
     const resp = await this.createOrgUseCase.execute({
       ...body,
@@ -88,6 +70,7 @@ export class OrgsController {
   }
 
   @Get('/:orgSlug/membership')
+  @ApiBearerAuth('AUTH_ROUTE')
   async getMembership(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
@@ -120,6 +103,7 @@ export class OrgsController {
   }
 
   @Get('/:orgSlug')
+  @ApiBearerAuth('AUTH_ROUTE')
   async getOrg(@Param('orgSlug') orgSlug: string) {
     const resp = await this.getOrgUseCase.execute({ orgSlug })
 
@@ -139,6 +123,7 @@ export class OrgsController {
   }
 
   @Get()
+  @ApiBearerAuth('AUTH_ROUTE')
   async fetchOrgs(@CurrentUser() user: TokenPayload) {
     const resp = await this.fetchOrgsUseCase.execute({ userId: user.sub })
 
@@ -158,10 +143,11 @@ export class OrgsController {
   }
 
   @Patch('/:orgSlug')
+  @ApiBearerAuth('AUTH_ROUTE')
   async updateOrganization(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,
-    @Body(updateOrganizationPype) body: UpdateOrganizationProps,
+    @Body(updateOrganizationPype) body: UpdateOrganizationPropsDto,
   ) {
     const resp = await this.updateOrgUseCase.execute({
       orgSlug,
@@ -189,6 +175,7 @@ export class OrgsController {
   }
 
   @Delete('/:orgSlug')
+  @ApiBearerAuth('AUTH_ROUTE')
   async deleteOrg(
     @CurrentUser() user: TokenPayload,
     @Param('orgSlug') orgSlug: string,

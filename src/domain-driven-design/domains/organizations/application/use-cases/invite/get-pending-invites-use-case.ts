@@ -2,23 +2,23 @@ import { Either, left, right } from '@core/either'
 import { ResourceNotFoundError } from '@core/errors/errors/resource-not-found-error'
 import { UnauthorizedError } from '@core/errors/errors/unauthorized-error'
 import { Injectable } from '@nestjs/common'
+import { OrgInvite } from '@orgs-entities/org-invite'
 import { BaseUsersRepository } from '@orgs-repositories/base-users-repository'
 import { MembersRepository } from '@orgs-repositories/members-repository'
 import { OrgInvitesRepository } from '@orgs-repositories/org-invites-repository'
 import { OrgsRepository } from '@orgs-repositories/orgs-repository'
 
-interface RejectInviteUseCaseRequest {
+interface GetPendingInvitesUseCaseRequest {
   userId: string
-  inviteId: string
 }
 
-type RejectInviteUseCaseResponse = Either<
+type GetPendingInvitesUseCaseResponse = Either<
   UnauthorizedError | ResourceNotFoundError,
-  { rejected: boolean }
+  { invites: OrgInvite[] }
 >
 
 @Injectable()
-export class RejectInviteUseCase {
+export class GetPendingInvitesUseCase {
   constructor(
     private readonly invitesRepository: OrgInvitesRepository,
     private readonly orgsRepository: OrgsRepository,
@@ -28,32 +28,15 @@ export class RejectInviteUseCase {
 
   async execute({
     userId,
-    inviteId,
-  }: RejectInviteUseCaseRequest): Promise<RejectInviteUseCaseResponse> {
-    const invite = await this.invitesRepository.findById(inviteId)
-
-    if (!invite) {
-      return left(new ResourceNotFoundError())
-    }
-
-    const org = await this.orgsRepository.findById(invite.organizationId.value)
-
-    if (!org) {
-      return left(new ResourceNotFoundError())
-    }
-
+  }: GetPendingInvitesUseCaseRequest): Promise<GetPendingInvitesUseCaseResponse> {
     const baseUser = await this.baseUsersRepository.findByEmail(userId)
 
     if (!baseUser) {
       return left(new ResourceNotFoundError())
     }
 
-    if (baseUser.email !== invite.email) {
-      return left(new UnauthorizedError())
-    }
+    const invites = await this.invitesRepository.findManyByEmail(baseUser.email)
 
-    await this.invitesRepository.delete(invite)
-
-    return right({ rejected: true })
+    return right({ invites })
   }
 }

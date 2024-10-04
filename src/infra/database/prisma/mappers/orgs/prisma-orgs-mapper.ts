@@ -8,7 +8,7 @@ export class PrismaOrgsMapper {
         ownerId: prismaOrgs.ownerId,
         name: prismaOrgs.name,
         url: prismaOrgs.url,
-        domain: prismaOrgs.domain,
+        domain: prismaOrgs.domain ?? undefined,
         shouldAttachUsersByDomain: prismaOrgs.shouldAttachUsersByDomain,
         avatarUrl: prismaOrgs.avatarUrl,
         createdAt: prismaOrgs.createdAt,

@@ -81,13 +81,13 @@ model Account {
 
 model Invite {
   id             String   @id @default(uuid())
-  authrorId      String?  @map("authror_id")
+  authorId       String?  @map("author_id")
   organizationId String   @map("organization_id")
   email          String
   role           Roles
   createdAt      DateTime @default(now()) @map("created_at")
 
-  authror      User?        @relation(fields: [authrorId], references: [id])
+  author       User?        @relation(fields: [authorId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
 
   @@unique([organizationId, email])

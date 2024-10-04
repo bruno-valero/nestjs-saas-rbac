@@ -75,6 +75,16 @@ export class PrismaProjectsRepository implements ProjectsRepository {
     return mappedProjects
   }
 
+  async countByOrgId(orgId: string): Promise<number> {
+    const prismaProjects = await this.prisma.project.count({
+      where: {
+        organizationId: orgId,
+      },
+    })
+
+    return prismaProjects
+  }
+
   async findManyByOwnerId(ownerId: string): Promise<Project[]> {
     const prismaProjects = await this.prisma.project.findMany({
       where: { ownerId },

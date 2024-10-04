@@ -20,10 +20,10 @@ See how to setup Nestjs with **auth Jwt**, **prisma ORM** and **Redis** for cach
 
 ### Authentication
 
+- [ ] It should be able to create an account using email, name and password
 - [ ] It should be able to authenticate users with email and password
 - [ ] It should be able to authenticate users with Github
 - [ ] It should be able to recover passwords using email
-- [ ] It should be able to create an account using email, name and password
 
 ### Organizations
 
@@ -76,6 +76,7 @@ See how to setup Nestjs with **auth Jwt**, **prisma ORM** and **Redis** for cach
 | List Members           | ✅     | ❌      | ❌       | ❌         |
 | Update Member Role     | ✅     | ❌      | ❌       | ❌         |
 | Delete Member          | ✅     | ⚠️       | ❌       | ❌         |
+| Read Project           | ✅     | ⚠️       | ⚠️        | ❌         |
 | List Projects          | ✅     | ✅      | ✅       | ❌         |
 | Create a new Project   | ✅     | ✅      | ❌       | ❌         |
 | Update Project         | ✅     | ⚠️      | ❌       | ❌         |
@@ -83,8 +84,6 @@ See how to setup Nestjs with **auth Jwt**, **prisma ORM** and **Redis** for cach
 | Get Billing Details    | ✅     | ❌      | ✅       | ❌         |
 | Export Billing Details | ✅     | ❌      | ✅       | ❌         |
 | Accept Invite          | ✅     | ✅      | ✅       | ❌         |
-| Create Project         | ✅     | ✅      | ✅       | ❌         |
-| Read Project           | ✅
 
 > ✅ => Allowed | 
 > ❌ => Not allowed | 
@@ -102,5 +101,13 @@ See how to setup Nestjs with **auth Jwt**, **prisma ORM** and **Redis** for cach
 ### Installation
 
 ```bash
-npm install
+npm install && docker compose up -d
+```
+
+### Swagger
+
+To access the swagger documentation, you can use the following url:
+
+```bash
+http://localhost:3333/docs
 ```
